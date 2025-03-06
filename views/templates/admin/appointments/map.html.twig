@@ -1,0 +1,95 @@
+
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+    }
+    .appointment-info {
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-header-title">
+            {{ 'Itinerary Map'|trans({}, 'Modules.Dimsymfony.Admin') }}
+          </h3>
+          <div class="card-header-actions">
+            <a href="{{ path('admin_dimsymphony_gestionrdv_view', {'id': appointment.id_dim_rdv}) }}" class="btn btn-outline-secondary">
+              <i class="material-icons">arrow_back</i>
+              {{ 'Back to details'|trans({}, 'Modules.Dimsymfony.Admin') }}
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="appointment-info">
+            <h4>{{ appointment.firstname }} {{ appointment.lastname }}</h4>
+            <p>{{ appointment.address }}, {{ appointment.postal_code }} {{ appointment.city }}</p>
+            <p>{{ 'Phone:'|trans({}, 'Modules.Dimsymfony.Admin') }} {{ appointment.phone }}</p>
+          </div>
+          
+          {% if googleApiKey %}
+            <div id="map"></div>
+            <div class="mt-3">
+              <div class="alert alert-info">
+                {{ 'This map shows the route from your shop location to the customer\'s address.'|trans({}, 'Modules.Dimsymfony.Admin') }}
+              </div>
+            </div>
+          {% else %}
+            <div class="alert alert-warning">
+              {{ 'Google Maps API key is not configured. Please set it in the module configuration.'|trans({}, 'Modules.Dimsymfony.Admin') }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  {% if googleApiKey %}
+    <script>
+      function initMap() {
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer();
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 7,
+          center: { lat: 48.8566, lng: 2.3522 }, // Paris as default center
+        });
+        
+        directionsRenderer.setMap(map);
+        
+        const origin = "{{ itineraryData.origin|raw }}";
+        const destination = "{{ itineraryData.destination|raw }}";
+        
+        const request = {
+          origin: origin,
+          destination: destination,
+          travelMode: google.maps.TravelMode.DRIVING,
+        };
+        
+        directionsService.route(request, (result, status) => {
+          if (status === "OK") {
+            directionsRenderer.setDirections(result);
+          } else {
+            console.error('Directions request failed due to ' + status);
+            alert("{{ 'Could not calculate directions. Please check the addresses.'|trans({}, 'Modules.Dimsymfony.Admin') }}");
+          }
+        });
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ googleApiKey }}&callback=initMap&v=weekly" defer></script>
+  {% endif %}
+{% endblock %}
