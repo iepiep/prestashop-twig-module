@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `PREFIX_dim_rdv` (
+CREATE TABLE IF NOT EXISTS `{prefix}dim_rdv` (
     `id_dim_rdv` INT(11) NOT NULL AUTO_INCREMENT,
     `lastname` VARCHAR(255) NOT NULL,
     `firstname` VARCHAR(255) NOT NULL,
