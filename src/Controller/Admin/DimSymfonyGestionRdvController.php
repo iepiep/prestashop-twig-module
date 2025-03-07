@@ -25,22 +25,22 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
      * @var ItineraryService
      */
     private $itineraryService;
-    
+
     /**
      * @var string
      */
     private $googleApiKey;
-    
+
     /**
      * @var LegacyContext
      */
     private $context;
-    
+
     /**
      * @var AppointmentRepository
      */
     private $appointmentRepository;
-    
+
     /**
      * @param ItineraryService $itineraryService
      * @param string $googleApiKey
@@ -58,7 +58,7 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
         $this->context = $context;
         $this->appointmentRepository = $appointmentRepository;
     }
-    
+
     /**
      * List all appointments
      *
@@ -68,7 +68,7 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
     public function indexAction(Request $request): Response
     {
         $appointments = $this->appointmentRepository->findAll();
-        
+
         return $this->render('@Modules/dimsymfony/views/templates/admin/appointments/index.html.twig', [
             'appointments' => $appointments,
             'layoutTitle' => $this->trans('Appointment Management', 'Modules.Dimsymfony.Admin'),
@@ -76,7 +76,7 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
             'help_link' => false,
         ]);
     }
-    
+
     /**
      * View a single appointment
      *
@@ -87,12 +87,12 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
     public function viewAction(Request $request, int $id): Response
     {
         $appointment = $this->appointmentRepository->find($id);
-        
+
         if (!$appointment) {
             $this->addFlash('error', $this->trans('Appointment not found', 'Modules.Dimsymfony.Admin'));
             return $this->redirectToRoute('admin_dimsymphony_gestionrdv_index');
         }
-        
+
         return $this->render('@Modules/dimsymfony/views/templates/admin/appointments/view.html.twig', [
             'appointment' => $appointment,
             'layoutTitle' => $this->trans('Appointment Details', 'Modules.Dimsymfony.Admin'),
@@ -100,7 +100,7 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
             'help_link' => false,
         ]);
     }
-    
+
     /**
      * Toggle the visited status of an appointment
      *
@@ -111,21 +111,21 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
     public function toggleVisitedAction(Request $request, int $id): RedirectResponse
     {
         $csrfToken = $request->request->get('_csrf_token');
-        
+
         if (!$this->isCsrfTokenValid('toggle-visited-' . $id, $csrfToken)) {
             $this->addFlash('error', $this->trans('Invalid CSRF token', 'Modules.Dimsymfony.Admin'));
             return $this->redirectToRoute('admin_dimsymphony_gestionrdv_index');
         }
-        
+
         if ($this->appointmentRepository->toggleVisited($id)) {
             $this->addFlash('success', $this->trans('Appointment status updated successfully', 'Modules.Dimsymfony.Admin'));
         } else {
             $this->addFlash('error', $this->trans('Failed to update appointment status', 'Modules.Dimsymfony.Admin'));
         }
-        
+
         return $this->redirectToRoute('admin_dimsymphony_gestionrdv_index');
     }
-    
+
     /**
      * Delete an appointment
      *
@@ -136,21 +136,21 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
     public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $csrfToken = $request->request->get('_csrf_token');
-        
+
         if (!$this->isCsrfTokenValid('delete-appointment-' . $id, $csrfToken)) {
             $this->addFlash('error', $this->trans('Invalid CSRF token', 'Modules.Dimsymfony.Admin'));
             return $this->redirectToRoute('admin_dimsymphony_gestionrdv_index');
         }
-        
+
         if ($this->appointmentRepository->delete($id)) {
             $this->addFlash('success', $this->trans('Appointment deleted successfully', 'Modules.Dimsymfony.Admin'));
         } else {
             $this->addFlash('error', $this->trans('Failed to delete appointment', 'Modules.Dimsymfony.Admin'));
         }
-        
+
         return $this->redirectToRoute('admin_dimsymphony_gestionrdv_index');
     }
-    
+
     /**
      * Show map for an appointment
      *
@@ -161,14 +161,14 @@ class DimSymfonyGestionRdvController extends FrameworkBundleAdminController
     public function mapAction(Request $request, int $id): Response
     {
         $appointment = $this->appointmentRepository->find($id);
-        
+
         if (!$appointment) {
             $this->addFlash('error', $this->trans('Appointment not found', 'Modules.Dimsymfony.Admin'));
             return $this->redirectToRoute('admin_dimsymphony_gestionrdv_index');
         }
-        
+
         $itineraryData = $this->itineraryService->getItineraryData($appointment);
-        
+
         return $this->render('@Modules/dimsymfony/views/templates/admin/appointments/map.html.twig', [
             'appointment' => $appointment,
             'itineraryData' => $itineraryData,
