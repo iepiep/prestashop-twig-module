@@ -79,7 +79,7 @@ class AdminDimSymfonyConfigController extends ModuleAdminController
         return $request;
     }
 
-    private function get($service)
+    public function get($service)
     {
         return \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance()->get($service);
     }

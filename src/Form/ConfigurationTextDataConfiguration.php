@@ -4,14 +4,19 @@
  * @copyright 2025 Roberto Minini
  * @license MIT
  */
-
 namespace DimSymfony\Form;
+
+// Si la variable d'environnement n'existe pas, on la définit par défaut (chaîne vide)
+if (false === getenv('DIMSYMFONY_GOOGLE_API_KEY')) {
+    putenv('DIMSYMFONY_GOOGLE_API_KEY=');
+}
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 use PrestaShop\PrestaShop\Adapter\Configuration;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 
 /**
  * Configuration data provider
@@ -61,7 +66,17 @@ class ConfigurationTextDataConfiguration
 
         $return[self::DIM_SYMFONY_TEXT_TYPE] = $welcomeMessages;
         $return[self::DIMSYMFONY_ENABLE_MAPS] = (bool) $this->configuration->get(self::DIMSYMFONY_ENABLE_MAPS);
-        $return[self::DIMSYMFONY_GOOGLE_API_KEY] = $this->configuration->get(self::DIMSYMFONY_GOOGLE_API_KEY);
+
+        // Tenter de récupérer la clé Google, et en cas d'absence, utiliser une chaîne vide
+        try {
+            $googleApiKey = $this->configuration->get(self::DIMSYMFONY_GOOGLE_API_KEY);
+        } catch (EnvNotFoundException $e) {
+            $googleApiKey = '';
+        }
+        if (!$googleApiKey) {
+            $googleApiKey = '';
+        }
+        $return[self::DIMSYMFONY_GOOGLE_API_KEY] = $googleApiKey;
 
         return $return;
     }
@@ -82,7 +97,10 @@ class ConfigurationTextDataConfiguration
             }
 
             $this->configuration->set(self::DIMSYMFONY_ENABLE_MAPS, (int) $configuration[self::DIMSYMFONY_ENABLE_MAPS]);
-            $this->configuration->set(self::DIMSYMFONY_GOOGLE_API_KEY, $configuration[self::DIMSYMFONY_GOOGLE_API_KEY]);
+
+            // Utiliser une valeur par défaut pour la clé Google si elle n'est pas fournie
+            $googleApiKey = $configuration[self::DIMSYMFONY_GOOGLE_API_KEY] ?? '';
+            $this->configuration->set(self::DIMSYMFONY_GOOGLE_API_KEY, $googleApiKey);
         }
 
         return $errors;
@@ -95,7 +113,7 @@ class ConfigurationTextDataConfiguration
      */
     private function validateConfiguration(array $configuration): bool
     {
-        // Check if welcome message is set for at least one language
+        // Vérifier qu'un message d'accueil est défini pour au moins une langue
         $hasWelcomeMessage = false;
         foreach ($configuration[self::DIM_SYMFONY_TEXT_TYPE] as $langId => $welcomeMessage) {
             if (!empty($welcomeMessage)) {
@@ -108,7 +126,7 @@ class ConfigurationTextDataConfiguration
             return false;
         }
 
-        // If maps are enabled, API key is required
+        // Si les maps sont activées, la clé API est requise (ici, la validation échoue si absente)
         if ($configuration[self::DIMSYMFONY_ENABLE_MAPS] && empty($configuration[self::DIMSYMFONY_GOOGLE_API_KEY])) {
             return false;
         }
