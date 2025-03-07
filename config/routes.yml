@@ -4,19 +4,17 @@ dimsymfony_configuration:
   defaults:
     _controller: 'Dimsymfony\Controller\Admin\ConfigurationController::indexAction'
 
-dimsymfony_customer_list: # Changement de nom
+dimsymfony_customer_list:
   path: /dimsymfony/customer-list
   methods: [GET]
   defaults:
     _controller: 'Dimsymfony\Controller\Admin\CustomerListController::indexAction'
 
-dimsymfony_itinerary:
-  path: /dimsymfony/itinerary/{id}
-  methods: [GET]
+dimsymfony_itinerary:  # Garder cette route, elle est utilisée par AJAX
+  path: /dimsymfony/itinerary
+  methods: [POST]
   defaults:
-    _controller: 'Dimsymfony\Controller\Admin\ItineraryController::viewAction'
-  requirements:
-      id: '\d+'
+    _controller: 'Dimsymfony\Controller\Admin\ItineraryController::generateItineraryAction'
 
 # Route pour le FrontController
 dimsymfony_itinerary_form:
