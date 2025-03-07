@@ -1,0 +1,12 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+    <div class="card">
+        <h3 class="card-header">
+            <i class="material-icons">description</i> {{ 'Other Page'|trans({}, 'Modules.Dimsymfony.Admin') }}
+        </h3>
+        <div class="card-body">
+            <p>{{ 'This is another page of the module.'|trans({}, 'Modules.Dimsymfony.Admin') }}</p>
+        </div>
+    </div>
+{% endblock %}
