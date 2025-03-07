@@ -3,14 +3,12 @@
 {% block content %}
     <div class="card">
         <h3 class="card-header">
-            <i class="material-icons">settings</i> {{ 'Customer Information'|trans({}, 'Modules.Dimsymfony.Admin') }}
+            <i class="material-icons">settings</i> {{ 'Configuration'|trans({}, 'Modules.Dimsymfony.Admin') }}
         </h3>
         <div class="card-body">
             {{ form_start(form) }}
-                {{ form_row(form.customer_name) }}
-                {{ form_row(form.destination) }}
-                {{ form_row(form.travel_date) }}
-                 <button type="submit" class="btn btn-primary">
+                {{ form_row(form.google_api_key) }}
+                <button type="submit" class="btn btn-primary">
                     {{ 'Save'|trans({}, 'Admin.Actions') }}
                 </button>
             {{ form_end(form) }}
