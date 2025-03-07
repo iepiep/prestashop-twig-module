@@ -1,33 +1,17 @@
-# Admin routes
-admin_dimsymphony_gestionrdv_index:
-  path: /dimsymfony/appointments
-  controller: 'DimSymfony\Controller\Admin\DimSymfonyGestionRdvController::indexAction'
-  methods: [GET]
+dimsymfony_configuration: # Corrected: Use your module name
+  path: /dimsymfony/configuration
+  methods: [GET, POST]
+  defaults:
+    _controller: 'Dimsymfony\Controller\Admin\ConfigurationController::indexAction' #Corrected Namespace
 
-admin_dimsymphony_gestionrdv_view:
-  path: /dimsymfony/appointments/{id}
-  controller: 'DimSymfony\Controller\Admin\DimSymfonyGestionRdvController::viewAction'
-  methods: [GET]
-  requirements:
-    id: \d+
+dimsymfony_other_page: # Corrected: Use your module name
+  path: /dimsymfony/other_page
+  methods: [GET, POST]
+  defaults:
+    _controller: 'Dimsymfony\Controller\Admin\OtherPageController::indexAction' #Corrected Namespace
 
-admin_dimsymphony_gestionrdv_toggle_visited:
-  path: /dimsymfony/appointments/{id}/toggle-visited
-  controller: 'DimSymfony\Controller\Admin\DimSymfonyGestionRdvController::toggleVisitedAction'
+dimsymfony_api:  # Corrected route name
+  path: /dimsymfony/api
   methods: [POST]
-  requirements:
-    id: \d+
-
-admin_dimsymphony_gestionrdv_delete:
-  path: /dimsymfony/appointments/{id}/delete
-  controller: 'DimSymfony\Controller\Admin\DimSymfonyGestionRdvController::deleteAction'
-  methods: [POST]
-  requirements:
-    id: \d+
-
-admin_dimsymphony_gestionrdv_map:
-  path: /dimsymfony/appointments/{id}/map
-  controller: 'DimSymfony\Controller\Admin\DimSymfonyGestionRdvController::mapAction'
-  methods: [GET]
-  requirements:
-    id: \d+
+  defaults:
+    _controller: 'Dimsymfony\Controller\Admin\ApiController::indexAction'
