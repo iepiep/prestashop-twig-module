@@ -1,4 +1,3 @@
-
 # Admin routes
 admin_dimsymphony_gestionrdv_index:
   path: /dimsymfony/appointments
