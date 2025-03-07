@@ -1,12 +1,14 @@
-
 <?php
 /**
  * @author Roberto Minini <r.minini@solution61.fr>
  * @copyright 2025 Roberto Minini
  * @license MIT
  */
-
 namespace DimSymfony\Form;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use PrestaShop\PrestaShop\Adapter\Configuration;
 
