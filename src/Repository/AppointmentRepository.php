@@ -4,6 +4,7 @@
  * @copyright 2025 Roberto Minini
  * @license MIT
  */
+
 namespace DimSymfony\Repository;
 
 if (!defined('_PS_VERSION_')) {
@@ -18,17 +19,17 @@ class AppointmentRepository
      * @var Connection
      */
     private $connection;
-    
+
     /**
      * @var string
      */
     private $dbPrefix;
-    
+
     /**
      * @var string
      */
     private $table;
-    
+
     /**
      * @param Connection $connection
      * @param string $dbPrefix
@@ -39,7 +40,7 @@ class AppointmentRepository
         $this->dbPrefix = $dbPrefix;
         $this->table = $this->dbPrefix . 'dim_rdv';
     }
-    
+
     /**
      * Get all appointments
      *
@@ -51,10 +52,10 @@ class AppointmentRepository
         $qb->select('*')
            ->from($this->table)
            ->orderBy('created_at', 'DESC');
-           
+
         return $qb->execute()->fetchAll();
     }
-    
+
     /**
      * Find an appointment by ID
      *
@@ -68,12 +69,12 @@ class AppointmentRepository
            ->from($this->table)
            ->where('id_dim_rdv = :id')
            ->setParameter('id', $id);
-           
+
         $result = $qb->execute()->fetch();
-        
+
         return $result ?: null;
     }
-    
+
     /**
      * Toggle the visited status of an appointment
      *
@@ -83,23 +84,23 @@ class AppointmentRepository
     public function toggleVisited(int $id): bool
     {
         $appointment = $this->find($id);
-        
+
         if (!$appointment) {
             return false;
         }
-        
+
         $newStatus = !$appointment['visited'];
-        
+
         $qb = $this->connection->createQueryBuilder();
         $qb->update($this->table)
            ->set('visited', ':visited')
            ->where('id_dim_rdv = :id')
            ->setParameter('visited', $newStatus, \PDO::PARAM_INT)
            ->setParameter('id', $id);
-           
+
         return (bool) $qb->execute();
     }
-    
+
     /**
      * Delete an appointment
      *
@@ -112,7 +113,7 @@ class AppointmentRepository
         $qb->delete($this->table)
            ->where('id_dim_rdv = :id')
            ->setParameter('id', $id);
-           
+
         return (bool) $qb->execute();
     }
 }
