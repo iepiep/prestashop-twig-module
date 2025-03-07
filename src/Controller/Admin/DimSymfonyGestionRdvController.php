@@ -5,7 +5,6 @@
  * @copyright 2025 Roberto Minini
  * @license MIT
  */
-
 namespace DimSymfony\Controller\Admin;
 
 use DimSymfony\Repository\AppointmentRepository;
