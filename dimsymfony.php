@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
 use Dimsymfony\Entity\CustomerItinerary;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface; // Pour générer l'URL du FrontController
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -10,6 +11,7 @@ if (!defined('_PS_VERSION_')) {
 
 class Dimsymfony extends Module implements WidgetInterface
 {
+    private $urlGenerator;
     public function __construct()
     {
         $this->name = 'dimsymfony';
@@ -25,6 +27,9 @@ class Dimsymfony extends Module implements WidgetInterface
         $this->displayName = $this->trans('Dim Symfony Module', [], 'Modules.Dimsymfony.Admin');
         $this->description = $this->trans('A simple module to demonstrate PrestaShop 8 development.', [], 'Modules.Dimsymfony.Admin');
         $this->confirmUninstall = $this->trans('Are you sure you want to uninstall?', [], 'Modules.Dimsymfony.Admin');
+        //Récupération du service de génération d'URL. Important pour le lien dans le widget
+        $this->urlGenerator = $this->get('router');
+
     }
 
     public function isUsingNewTranslationSystem(): bool
@@ -35,7 +40,7 @@ class Dimsymfony extends Module implements WidgetInterface
     public function install()
     {
         return parent::install()
-            && $this->registerHook('displayHome') // Keep this hook
+            && $this->registerHook('displayBanner') // Utilisation de displayBanner
             && $this->installTab()
             && $this->installDatabase();
     }
@@ -46,7 +51,6 @@ class Dimsymfony extends Module implements WidgetInterface
             && $this->uninstallTab()
             && $this->uninstallDatabase();
     }
-
     private function installTab()
     {
         // ... (same as previous response) ...
@@ -71,26 +75,20 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function installSubTabs()
     {
-         // ... (same as previous response) ...
-         $subTabs = [
+        $subTabs = [
             [
                 'class_name' => 'DimsymfonyConfiguration',
                 'name' => 'Configuration',
                 'icon' => 'settings',
-                'route_name' => 'dimsymfony_configuration' // Corrected: Use your module name
+                'route_name' => 'dimsymfony_configuration'
             ],
             [
-                'class_name' => 'DimsymfonyOtherPage',
-                'name' => 'Other Page',
-                'icon' => 'settings',
-                'route_name' => 'dimsymfony_other_page' // Corrected: Use your module name
+                'class_name' => 'DimsymfonyCustomerList', // Changement de nom
+                'name' => 'Customer List',
+                'icon' => 'list',
+                'route_name' => 'dimsymfony_customer_list' // Changement de nom
             ],
-            [
-                'class_name' => 'DimsymfonyApi',
-                'name' => 'API',
-                'icon' => 'settings',
-                'route_name' => 'dimsymfony_api'  // Corrected: Use your module name
-            ],
+            // Pas de tab pour ItineraryController, car on y accède via un bouton
         ];
 
         $parentTabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
@@ -100,21 +98,21 @@ class Dimsymfony extends Module implements WidgetInterface
 
         $success = true;
         foreach ($subTabs as $subTab) {
-          $tabId = (int) Tab::getIdFromClassName($subTab['class_name']);
-          if (!$tabId) {
-              $tab = new Tab();
-          } else {
-              $tab = new Tab($tabId);
-          }
+            $tabId = (int) Tab::getIdFromClassName($subTab['class_name']);
+            if (!$tabId) {
+                $tab = new Tab();
+            } else {
+                $tab = new Tab($tabId);
+            }
             $tab->active = 1;
             $tab->class_name = $subTab['class_name'];
-            $tab->name = array();
+            $tab->name = [];
             foreach (Language::getLanguages() as $lang) {
                 $tab->name[$lang['id_lang']] = $subTab['name'];
             }
             $tab->id_parent = $parentTabId;
             $tab->module = $this->name;
-            $tab->icon = $subTab['icon']; // Corrected: Use the icon
+            $tab->icon = $subTab['icon'];
 
             $success = $success && $tab->save();
         }
@@ -124,22 +122,20 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function uninstallTab()
     {
-        // ... (same as previous response) ...
         $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
         if ($tabId) {
             $tab = new Tab($tabId);
-            return $tab->delete() && $this->uninstallSubTabs(); //Correct order.
+            return $tab->delete() && $this->uninstallSubTabs();
         }
-        return true; //If no tab id, consider uninstalled.
+        return true;
     }
 
     private function uninstallSubTabs()
     {
-        // ... (same as previous response) ...
         $subTabs = [
             'DimsymfonyConfiguration',
-            'DimsymfonyOtherPage',
-            'DimsymfonyApi'
+            'DimsymfonyCustomerList', // Changement de nom
+            // Pas de tab pour ItineraryController
         ];
 
         $success = true;
@@ -154,10 +150,10 @@ class Dimsymfony extends Module implements WidgetInterface
         return $success;
     }
 
+
     private function installDatabase()
     {
-         // ... (same as previous response) ...
-         $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'customer_itinerary` (
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'customer_itinerary` (
             `id_customer_itinerary` INT UNSIGNED NOT NULL AUTO_INCREMENT,
             `customer_name` VARCHAR(255) NOT NULL,
             `destination` VARCHAR(255) NOT NULL,
@@ -171,45 +167,35 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function uninstallDatabase()
     {
-        // ... (same as previous response) ...
         $sql = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'customer_itinerary`;';
         return Db::getInstance()->execute($sql);
     }
 
-
-    // WidgetInterface methods (Implementation)
+    // Widget pour displayBanner
     public function renderWidget($hookName, array $configuration)
     {
-        if ($hookName !== 'displayHome') {
-            return; // Only render on the home page
+
+        if ($hookName != 'displayBanner') {
+            return '';
         }
+        $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
+        return $this->fetch('module:dimsymfony/views/templates/hook/banner.tpl');
 
-        $widgetVariables = $this->getWidgetVariables($hookName, $configuration);
-
-        if (empty($widgetVariables)) {
-            return;
-        }
-
-        $this->smarty->assign($widgetVariables);
-        return $this->fetch('module:dimsymfony/views/templates/hook/home.tpl'); // New template
     }
 
     public function getWidgetVariables($hookName, array $configuration)
     {
-        if ($hookName !== 'displayHome') {
+        if ($hookName != 'displayBanner') {
             return [];
         }
-        // Fetch destinations from the database.  Use DQL for efficiency.
-        $entityManager = $this->get('doctrine.orm.entity_manager');
-        $query = $entityManager->createQuery(
-            'SELECT DISTINCT c.destination FROM Dimsymfony\Entity\CustomerItinerary c'
-        );
-        $destinations = $query->getResult();
 
+        // Générer l'URL vers le FrontController (formulaire)
+        $formUrl = $this->urlGenerator->generate('dimsymfony_itinerary_form'); // Nom de la route du FrontController
 
-        // Return the variables to be used in the template
         return [
-            'destinations' => $destinations,
+            'message' => $this->trans('Plan your trip with us! Book an appointment.', [], 'Modules.Dimsymfony.Front'),
+            'button_url' => $formUrl,
+            'button_text' => $this->trans('Book Now', [], 'Modules.Dimsymfony.Front'),
         ];
     }
 }
