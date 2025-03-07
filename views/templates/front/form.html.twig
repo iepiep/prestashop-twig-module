@@ -1,0 +1,12 @@
+{% extends 'page.html.twig' %}
+
+{% block content %}
+    <h1>{{ 'Request an Itinerary'|trans({}, 'Modules.Dimsymfony.Front') }}</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.customer_name) }}
+        {{ form_row(form.destination) }}
+        {{ form_row(form.travel_date) }}
+        <button type="submit">{{ 'Submit'|trans({}, 'Modules.Dimsymfony.Front') }}</button>
+    {{ form_end(form) }}
+{% endblock %}
