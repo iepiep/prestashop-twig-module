@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
+use Dimsymfony\Entity\CustomerItinerary; // Import the entity
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -12,7 +13,7 @@ class Dimsymfony extends Module implements WidgetInterface
     public function __construct()
     {
         $this->name = 'dimsymfony';
-        $this->tab = 'front_office_features'; // Corrected: Use a valid tab category
+        $this->tab = 'front_office_features';
         $this->version = '1.0.0';
         $this->author = 'Iepiep';
         $this->need_instance = 0;
@@ -34,18 +35,21 @@ class Dimsymfony extends Module implements WidgetInterface
     public function install()
     {
         return parent::install()
-            && $this->registerHook('displayHome') // Example hook, keep as needed
-            && $this->installTab();
+            && $this->registerHook('displayHome') // Example hook
+            && $this->installTab()
+            && $this->installDatabase(); // Install the database table
     }
 
     public function uninstall()
     {
         return parent::uninstall()
-            && $this->uninstallTab();
+            && $this->uninstallTab()
+            && $this->uninstallDatabase(); // Uninstall the database table
     }
 
     private function installTab()
     {
+        // ... (same as previous response, no changes here) ...
         $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
         if (!$tabId) {
             $tab = new Tab();
@@ -64,9 +68,9 @@ class Dimsymfony extends Module implements WidgetInterface
 
         return $tab->save() && $this->installSubTabs();
     }
-
     private function installSubTabs()
     {
+        // ... (same as previous response, no changes here) ...
         $subTabs = [
             [
                 'class_name' => 'DimsymfonyConfiguration',
@@ -117,19 +121,19 @@ class Dimsymfony extends Module implements WidgetInterface
         return $success;
     }
 
-
     private function uninstallTab()
     {
-        $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
-        if ($tabId) {
-            $tab = new Tab($tabId);
-            return $tab->delete() && $this->uninstallSubTabs(); //Correct order.
-        }
-        return true; //If no tab id, consider uninstalled.
+         // ... (same as previous response, no changes here) ...
+         $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
+         if ($tabId) {
+             $tab = new Tab($tabId);
+             return $tab->delete() && $this->uninstallSubTabs(); //Correct order.
+         }
+         return true; //If no tab id, consider uninstalled.
     }
-
     private function uninstallSubTabs()
     {
+        // ... (same as previous response, no changes here) ...
         $subTabs = [
             'DimsymfonyConfiguration',
             'DimsymfonyOtherPage',
@@ -148,7 +152,25 @@ class Dimsymfony extends Module implements WidgetInterface
         return $success;
     }
 
+    private function installDatabase()
+    {
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'customer_itinerary` (
+            `id_customer_itinerary` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `customer_name` VARCHAR(255) NOT NULL,
+            `destination` VARCHAR(255) NOT NULL,
+            `travel_date` DATE NOT NULL,
+            `itinerary_details` TEXT,
+            PRIMARY KEY (`id_customer_itinerary`)
+        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
+        return Db::getInstance()->execute($sql);
+    }
+
+    private function uninstallDatabase()
+    {
+        $sql = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'customer_itinerary`;';
+        return Db::getInstance()->execute($sql);
+    }
     public function renderWidget($hookName, array $configuration)
     {
         // Implement widget rendering if you use hooks (e.g., displayHome)
