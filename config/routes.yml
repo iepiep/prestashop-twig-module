@@ -1,24 +1,27 @@
-dimsymfony_configuration:
-  path: /dimsymfony/configuration
-  methods: [GET, POST]
-  defaults:
-    _controller: 'Dimsymfony\Controller\Admin\ConfigurationController::indexAction'
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
 
-dimsymfony_customer_list:
-  path: /dimsymfony/customer-list
-  methods: [GET]
-  defaults:
-    _controller: 'Dimsymfony\Controller\Admin\CustomerListController::indexAction'
+  Dimsymfony\:
+    resource: '../src/*'
+    exclude: '../src/{Entity,Resources,Tests}'
 
-dimsymfony_itinerary:  # Garder cette route, elle est utilisée par AJAX
-  path: /dimsymfony/itinerary
-  methods: [POST]
-  defaults:
-    _controller: 'Dimsymfony\Controller\Admin\ItineraryController::generateItineraryAction'
+  Dimsymfony\Controller\Admin\:
+    resource: '../src/Controller/Admin'
+    tags: ['controller.service_arguments']
 
-# Route pour le FrontController
-dimsymfony_itinerary_form:
-  path: /itinerary-form
-  methods: [GET, POST]
-  defaults:
-    _controller: 'Dimsymfony\Controller\Front\ItineraryFormController::indexAction'
+  Dimsymfony\Controller\Front\:
+    resource: '../src/Controller/Front'
+    tags: ['controller.service_arguments']
+
+  Dimsymfony\Service\ItineraryService: # Injection explicite des arguments
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
+      $httpClient: '@Symfony\Contracts\HttpClient\HttpClientInterface'
+
+  doctrine.orm.entity_manager:
+    alias: 'Doctrine\ORM\EntityManagerInterface'
+
+  Symfony\Contracts\HttpClient\HttpClientInterface: ~
