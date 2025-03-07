@@ -3,7 +3,7 @@
 {% block content %}
   <div class="card">
     <h3 class="card-header">
-      <i class="material-icons">list</i> {{ 'Customer Itineraries'|trans({}, 'Modules.Dimsymfony.Admin') }}
+      <i class="material-icons">list</i> {{ 'Customer Appointments'|trans({}, 'Modules.Dimsymfony.Admin') }}
     </h3>
     <div class="card-body">
       <form id="itinerary-form" action="{{ path('dimsymfony_itinerary') }}" method="post">
@@ -11,10 +11,16 @@
           <thead>
             <tr>
               <th>{{ 'ID'|trans({}, 'Admin.Global') }}</th>
-              <th>{{ 'Customer Name'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
-              <th>{{ 'Destination'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
-              <th>{{ 'Travel Date'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
-              <th>{{ 'Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Last Name'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'First Name'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Address'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Postal Code'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'City'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Phone'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Email'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Preferred Date 1'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Preferred Date 2'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Visited'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
               <th>
                 <input type="checkbox" id="select-all"> {{ 'Select All'|trans({}, 'Admin.Actions') }}
               </th>
@@ -24,23 +30,23 @@
             {% for customer in customerData %}
               <tr>
                 <td>{{ customer.id }}</td>
-                <td>{{ customer.customerName }}</td>
-                <td>{{ customer.destination }}</td>
-                <td>{{ customer.travelDate|date('Y-m-d') }}</td>
-                <td>
-                    {% if customer.itineraryDetails is not null %}
-                        {{ customer.itineraryDetails }}
-                    {% else %}
-                        {{ 'Not generated'|trans({}, 'Modules.Dimsymfony.Admin') }}
-                    {% endif %}
-                </td>
+                <td>{{ customer.lastName }}</td>
+                <td>{{ customer.firstName }}</td>
+                <td>{{ customer.address }}</td>
+                <td>{{ customer.postalCode }}</td>
+                <td>{{ customer.city }}</td>
+                <td>{{ customer.phone }}</td>
+                <td>{{ customer.email }}</td>
+                <td>{{ customer.dateCreneau1 }}</td>
+                <td>{{ customer.dateCreneau2 }}</td>
+                <td>{{ customer.visited ? 'Yes'|trans({}, 'Admin.Global') : 'No'|trans({}, 'Admin.Global') }}</td>
                 <td>
                   <input type="checkbox" name="selected_customers[]" value="{{ customer.id }}" class="customer-checkbox">
                 </td>
               </tr>
             {% else %}
               <tr>
-                <td colspan="6">{{ 'No customer data found.'|trans({}, 'Modules.Dimsymfony.Admin') }}</td>
+                <td colspan="12">{{ 'No customer data found.'|trans({}, 'Modules.Dimsymfony.Admin') }}</td>
               </tr>
             {% endfor %}
           </tbody>
