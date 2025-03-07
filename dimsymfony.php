@@ -42,14 +42,16 @@ class Dimsymfony extends Module implements WidgetInterface
         return parent::install()
             && $this->registerHook('displayBanner') // Utilisation de displayBanner
             && $this->installTab()
-            && $this->installDatabase();
+            && $this->installDatabase()
+            && Configuration::updateValue('DIMSYMFONY_BASE_LOCATION', '25 rue de la Noé Pierre, 53960 Bonchamp-lès-Laval, France');
     }
 
     public function uninstall()
     {
-        return parent::uninstall()
-            && $this->uninstallTab()
-            && $this->uninstallDatabase();
+      return parent::uninstall()
+          && $this->uninstallTab()
+          && $this->uninstallDatabase()
+          && Configuration::deleteByName('DIMSYMFONY_BASE_LOCATION'); // Supprimer la configuration
     }
     private function installTab()
     {
