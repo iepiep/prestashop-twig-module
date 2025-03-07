@@ -1,15 +1,39 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block content %}
-    <div class="card">
-        <h3 class="card-header">
-            <i class="material-icons">map</i> {{ 'Itinerary for'|trans({}, 'Modules.Dimsymfony.Admin') }} {{ customerItinerary.customerName }}
-        </h3>
-        <div class="card-body">
-            <p><strong>{{ 'Destination'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong> {{ customerItinerary.destination }}</p>
-            <p><strong>{{ 'Travel Date'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong> {{ customerItinerary.travelDate|date('Y-m-d') }}</p>
-            <p><strong>{{ 'Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong></p>
-            <pre>{{ itinerary }}</pre>
-        </div>
+  <div class="card">
+    <h3 class="card-header">
+      <i class="material-icons">map</i> {{ 'Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}
+    </h3>
+    <div class="card-body">
+      {% if itineraryData %}
+        <h4>{{ 'Start Address'|trans({}, 'Modules.Dimsymfony.Admin') }}:</h4>
+        <p>{{ itineraryData.start_address }}</p>
+
+        <h4>{{ 'Optimized Route'|trans({}, 'Modules.Dimsymfony.Admin') }}:</h4>
+        <ul>
+          {% for stop in itineraryData.optimized_route %}
+            <li>
+              {% if stop.is_base %}
+                <strong>{{ 'Base'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong>
+              {% else %}
+                <strong>{{ 'Client'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong> {{ stop.firstname }} {{ stop.lastname }} -
+              {% endif %}
+              {{ stop.full_address }}
+            </li>
+          {% endfor %}
+        </ul>
+
+        <h4>{{ 'Itinerary Schedule'|trans({}, 'Modules.Dimsymfony.Admin') }}:</h4>
+        <ul>
+          {% for item in itineraryData.itinerary_schedule %}
+            <li>{{ item.time }} - {{ item.firstname }} {{ item.lastname }} ({{ item.address }})</li>
+          {% endfor %}
+        </ul>
+
+      {% else %}
+        <p>{{ 'No itinerary data available.'|trans({}, 'Modules.Dimsymfony.Admin') }}</p>
+      {% endif %}
     </div>
+  </div>
 {% endblock %}
