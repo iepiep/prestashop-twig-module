@@ -1,17 +1,26 @@
-dimsymfony_configuration: # Corrected: Use your module name
+dimsymfony_configuration:
   path: /dimsymfony/configuration
   methods: [GET, POST]
   defaults:
-    _controller: 'Dimsymfony\Controller\Admin\ConfigurationController::indexAction' #Corrected Namespace
+    _controller: 'Dimsymfony\Controller\Admin\ConfigurationController::indexAction'
 
-dimsymfony_other_page: # Corrected: Use your module name
-  path: /dimsymfony/other_page
+dimsymfony_customer_list: # Changement de nom
+  path: /dimsymfony/customer-list
+  methods: [GET]
+  defaults:
+    _controller: 'Dimsymfony\Controller\Admin\CustomerListController::indexAction'
+
+dimsymfony_itinerary:
+  path: /dimsymfony/itinerary/{id}
+  methods: [GET]
+  defaults:
+    _controller: 'Dimsymfony\Controller\Admin\ItineraryController::viewAction'
+  requirements:
+      id: '\d+'
+
+# Route pour le FrontController
+dimsymfony_itinerary_form:
+  path: /itinerary-form
   methods: [GET, POST]
   defaults:
-    _controller: 'Dimsymfony\Controller\Admin\OtherPageController::indexAction' #Corrected Namespace
-
-dimsymfony_api:  # Corrected route name
-  path: /dimsymfony/api
-  methods: [POST]
-  defaults:
-    _controller: 'Dimsymfony\Controller\Admin\ApiController::indexAction'
+    _controller: 'Dimsymfony\Controller\Front\ItineraryFormController::indexAction'
