@@ -6,15 +6,15 @@ use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Response;
 use Dimsymfony\Entity\CustomerItinerary;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\Annotation\Route; // Import pour les annotations de route (facultatif, mais propre)
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Route("/customer-list") // Préfixe de route pour toutes les actions (facultatif, mais propre)
+ * @Route("/customer-list")
  */
 class CustomerListController extends FrameworkBundleAdminController
 {
-    private $entityManager;
+     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
