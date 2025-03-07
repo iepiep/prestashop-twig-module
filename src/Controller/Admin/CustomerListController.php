@@ -4,7 +4,7 @@ namespace Dimsymfony\Controller\Admin;
 
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Response;
-use Dimsymfony\Entity\CustomerItinerary;
+use Dimsymfony\Entity\Rdv; // Utilisation de la nouvelle entité Rdv
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CustomerListController extends FrameworkBundleAdminController
 {
-     private $entityManager;
+    private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -25,7 +25,7 @@ class CustomerListController extends FrameworkBundleAdminController
      */
     public function indexAction(): Response
     {
-        $repository = $this->entityManager->getRepository(CustomerItinerary::class);
+        $repository = $this->entityManager->getRepository(Rdv::class);
         $customerData = $repository->findAll();
 
         return $this->render('@Modules/dimsymfony/views/templates/admin/customer_list.html.twig', [
