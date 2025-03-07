@@ -6,6 +6,10 @@
  */
 namespace DimSymfony\Controller\Admin;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use DimSymfony\Repository\AppointmentRepository;
 use DimSymfony\Service\ItineraryService;
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
