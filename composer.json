@@ -1,25 +1,24 @@
 {
-  "name": "iepiep/dimsymfony",
-  "description": "DIM - Appointment Management Module for PrestaShop 8",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Roberto Minini",
-      "email": "r.minini@solution61.fr"
-    }
-  ],
-  "autoload": {
-    "psr-4": {
-      "DimSymfony\\": "src/"
-    }
-  },
-  "require": {
-    "php": ">=7.4.0",
-    "prestashop/prestashop-composer-plugin": "^3.0"
-  },
-  "config": {
-    "preferred-install": "dist",
-    "prepend-autoloader": false
-  },
-  "type": "prestashop-module"
+    "name": "iepiep/dimsymfony",
+    "description": "A simple module to demonstrate PrestaShop 8 development.",
+    "authors": [
+        {
+            "name": "Roberto Minini",
+            "email": "iepiep74@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/http-client-contracts": "^2.5|^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dimsymfony\\": "src/"
+        }
+    },
+    "config": {
+        "prepend-autoloader": false
+    },
+    "type": "prestashop-module"
 }
