@@ -1,3 +1,4 @@
+
 <?php
 /**
  * @author Roberto Minini <r.minini@solution61.fr>
@@ -29,53 +30,43 @@ class ItineraryService
 
     /**
      * Get itinerary data for an appointment
-     * 
-     * @param array $appointment The appointment data
-     * @return array Itinerary data
+     *
+     * @param array $appointment
+     * @return array
      */
     public function getItineraryData(array $appointment): array
     {
-        // Get shop address from configuration
-        $shopAddress = $this->getShopAddress();
-        
-        // Format appointment address
-        $destinationAddress = $this->formatAppointmentAddress($appointment);
-        
+        // Format the full address
+        $fullAddress = sprintf(
+            '%s, %s %s, France',
+            $appointment['address'],
+            $appointment['postal_code'],
+            $appointment['city']
+        );
+
+        // Sample itinerary data - in a real module, this would call an external API
         return [
-            'origin' => $shopAddress,
-            'destination' => $destinationAddress,
-            'appointment' => $appointment,
+            'destination' => $fullAddress,
+            'client_name' => $appointment['firstname'] . ' ' . $appointment['lastname'],
+            'estimated_travel_time' => '25 minutes',
+            'distance' => '15 km',
+            'suggested_departure_time' => $this->getSuggestedDepartureTime($appointment['date_creneau1'])
         ];
     }
-    
+
     /**
-     * Format the appointment address for Google Maps
-     * 
-     * @param array $appointment
-     * @return string Formatted address
+     * Calculate suggested departure time based on appointment slot
+     *
+     * @param string $appointmentSlot
+     * @return string
      */
-    private function formatAppointmentAddress(array $appointment): string
+    private function getSuggestedDepartureTime(string $appointmentSlot): string
     {
-        return urlencode(
-            $appointment['address'] . ', ' . 
-            $appointment['postal_code'] . ' ' . 
-            $appointment['city'] . ', France'
-        );
-    }
-    
-    /**
-     * Get shop address from configuration
-     * 
-     * @return string Formatted shop address
-     */
-    private function getShopAddress(): string
-    {
-        $shop = $this->context->getContext()->shop;
-        $address = \Configuration::get('PS_SHOP_ADDR1', null, $shop->id_shop_group, $shop->id);
-        $city = \Configuration::get('PS_SHOP_CITY', null, $shop->id_shop_group, $shop->id);
-        $postcode = \Configuration::get('PS_SHOP_CODE', null, $shop->id_shop_group, $shop->id);
-        $country = \Configuration::get('PS_SHOP_COUNTRY', null, $shop->id_shop_group, $shop->id);
-        
-        return urlencode("$address, $postcode $city, $country");
+        // Parse the slot to determine if it's morning or afternoon
+        if (strpos($appointmentSlot, 'MATIN') !== false) {
+            return '08:30'; // For morning appointments
+        } else {
+            return '13:30'; // For afternoon appointments
+        }
     }
 }
