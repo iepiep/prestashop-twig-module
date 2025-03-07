@@ -12,5 +12,11 @@ services:
     resource: '../src/Controller/Admin'
     tags: ['controller.service_arguments']
 
+  Dimsymfony\Controller\Front\:  # Ajout pour le FrontController
+    resource: '../src/Controller/Front'
+    tags: ['controller.service_arguments']
+
   doctrine.orm.entity_manager:
     alias: 'Doctrine\ORM\EntityManagerInterface'
+
+  Symfony\Contracts\HttpClient\HttpClientInterface: ~ # Pour l'injection du client HTTP
