@@ -1,25 +1,27 @@
 services:
-  _defaults:
-    public: true
-    autowire: true
-    autoconfigure: true
-    bind:
-      $googleApiKey: '%dimsymphony.google_api_key%'
-
   # Register all controllers in the DimSymfony\Controller namespace
   DimSymfony\Controller\:
     resource: '../src/Controller'
     tags: ['controller.service_arguments']
+    public: true
+    autowire: true
+    autoconfigure: true
 
   # Register all services in the DimSymfony\Service namespace
   DimSymfony\Service\:
     resource: '../src/Service'
+    public: true
+    autowire: true
+    autoconfigure: true
 
   # Specific service for itinerary management
   Dimsymfony.service.itinerary_service:
     class: DimSymfony\Service\ItineraryService
     arguments:
       - '@prestashop.adapter.legacy.context'
+    public: true
+    autowire: true
+    autoconfigure: true
 
   # Register the GestionRdvController (Symfony-based)
   DimSymfony\Controller\Admin\DimSymfonyGestionRdvController:
@@ -30,6 +32,9 @@ services:
       - '@prestashop.adapter.legacy.context'
     tags:
       - { name: 'controller.service_arguments' }
+    public: true
+    autowire: true
+    autoconfigure: true
 
   # Repository for appointments
   DimSymfony\Repository\AppointmentRepository:
@@ -37,12 +42,19 @@ services:
     arguments:
       - '@doctrine.dbal.default_connection'
       - '%database_prefix%'
+    public: true
+    autowire: true
+    autoconfigure: true
 
   # Form-related services
   prestashop.module.dimsymfony.form.type.configuration_text:
     class: DimSymfony\Form\ConfigurationFormType
     parent: form.type.translatable.aware
     public: true
+    autowire: false         # Défini explicitement car il utilise un parent
+    autoconfigure: false    # Défini explicitement
+    arguments:
+      - '%dimsymphony.google_api_key%'
     tags:
       - { name: form.type }
 
@@ -50,11 +62,17 @@ services:
     class: DimSymfony\Form\ConfigurationTextDataConfiguration
     arguments:
       - '@prestashop.adapter.legacy.configuration'
+    public: true
+    autowire: true
+    autoconfigure: true
 
   prestashop.module.dimsymfony.form.configuration_text_form_data_provider:
     class: DimSymfony\Form\ConfigurationTextFormDataProvider
     arguments:
       - '@prestashop.module.dimsymfony.form.configuration_text_data_configuration'
+    public: true
+    autowire: true
+    autoconfigure: true
 
   prestashop.module.dimsymfony.form.configuration_text_form_data_handler:
     class: PrestaShop\PrestaShop\Core\Form\Handler
@@ -64,6 +82,9 @@ services:
       - '@prestashop.module.dimsymfony.form.configuration_text_form_data_provider'
       - 'DimSymfony\Form\ConfigurationFormType'
       - 'Configuration'
+    public: true
+    autowire: true
+    autoconfigure: true
 
 parameters:
   dimsymphony.google_api_key: '%env(DIMSYMFONY_GOOGLE_API_KEY)%'
