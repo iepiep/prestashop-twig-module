@@ -1,12 +1,54 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block content %}
-    <div class="card">
-        <h3 class="card-header">
-            <i class="material-icons">description</i> {{ 'Other Page'|trans({}, 'Modules.Dimsymfony.Admin') }}
-        </h3>
-        <div class="card-body">
-            <p>{{ 'This is another page of the module.'|trans({}, 'Modules.Dimsymfony.Admin') }}</p>
-        </div>
+  <div class="card">
+    <h3 class="card-header">
+      <i class="material-icons">list</i> {{ 'Customer Itineraries'|trans({}, 'Modules.Dimsymfony.Admin') }}
+    </h3>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{{ 'ID'|trans({}, 'Admin.Global') }}</th>
+            <th>{{ 'Customer Name'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+            <th>{{ 'Destination'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+            <th>{{ 'Travel Date'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+            <th>{{ 'Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+            <th>{{ 'Actions'|trans({}, 'Admin.Actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customerData %}
+            <tr>
+              <td>{{ customer.id }}</td>
+              <td>{{ customer.customerName }}</td>
+              <td>{{ customer.destination }}</td>
+              <td>{{ customer.travelDate|date('Y-m-d') }}</td>
+              <td>
+                {% if customer.itineraryDetails is not null %}
+                        {{ customer.itineraryDetails }}
+                    {% else %}
+                        {{ 'Not generated'|trans({}, 'Modules.Dimsymfony.Admin') }}
+                    {% endif %}
+                </td>
+              <td>
+                <button class="btn btn-primary generate-itinerary" data-customer-id="{{ customer.id }}">
+                  {{ 'Generate Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}
+                </button>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4">{{ 'No customer data found.'|trans({}, 'Modules.Dimsymfony.Admin') }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('modules/dimsymfony/views/js/dimsymfony.js') }}"></script>
 {% endblock %}
