@@ -16,7 +16,7 @@ services:
     resource: '../src/Controller/Front'
     tags: ['controller.service_arguments']
 
-  Dimsymfony\Service\ItineraryService: # Assurez-vous que le service est défini
+  Dimsymfony\Service\ItineraryService: # Injection explicite des arguments
     arguments:
       $entityManager: '@doctrine.orm.entity_manager'
       $httpClient: '@Symfony\Contracts\HttpClient\HttpClientInterface'
