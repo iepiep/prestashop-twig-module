@@ -1,0 +1,15 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+    <div class="card">
+        <h3 class="card-header">
+            <i class="material-icons">map</i> {{ 'Itinerary for'|trans({}, 'Modules.Dimsymfony.Admin') }} {{ customerItinerary.customerName }}
+        </h3>
+        <div class="card-body">
+            <p><strong>{{ 'Destination'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong> {{ customerItinerary.destination }}</p>
+            <p><strong>{{ 'Travel Date'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong> {{ customerItinerary.travelDate|date('Y-m-d') }}</p>
+            <p><strong>{{ 'Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}:</strong></p>
+            <pre>{{ itinerary }}</pre>
+        </div>
+    </div>
+{% endblock %}
