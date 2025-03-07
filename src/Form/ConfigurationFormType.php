@@ -5,8 +5,11 @@
  * @copyright 2025 Roberto Minini
  * @license MIT
  */
-
 namespace DimSymfony\Form;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use PrestaShopBundle\Form\Admin\Type\TranslatableType;
 use PrestaShopBundle\Form\Admin\Type\SwitchType;
