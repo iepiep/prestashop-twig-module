@@ -32,9 +32,9 @@
                     {% endif %}
                 </td>
               <td>
-                <button class="btn btn-primary generate-itinerary" data-customer-id="{{ customer.id }}">
-                  {{ 'Generate Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}
-                </button>
+                <a href="{{ path('dimsymfony_itinerary', {id: customer.id}) }}" class="btn btn-primary">
+                  {{ 'View Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}
+                </a>
               </td>
             </tr>
           {% else %}
@@ -46,9 +46,4 @@
       </table>
     </div>
   </div>
-{% endblock %}
-
-{% block javascripts %}
-  {{ parent() }}
-  <script src="{{ asset('modules/dimsymfony/views/js/dimsymfony.js') }}"></script>
 {% endblock %}
