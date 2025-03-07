@@ -5,7 +5,6 @@
  * @copyright 2025 Roberto Minini
  * @license MIT
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -39,7 +38,7 @@ class AdminDimSymfonyConfigController extends ModuleAdminController
     {
         $container = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance();
         $formHandler = $container->get('prestashop.module.dimsymfony.form.configuration_text_form_data_handler');
-        
+
         $shopConstraint = ShopConstraint::allShops();
         $this->content = $this->renderConfigurationForm($formHandler, $shopConstraint);
 
