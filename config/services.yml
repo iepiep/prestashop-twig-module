@@ -12,11 +12,16 @@ services:
     resource: '../src/Controller/Admin'
     tags: ['controller.service_arguments']
 
-  Dimsymfony\Controller\Front\:  # Ajout pour le FrontController
+  Dimsymfony\Controller\Front\:
     resource: '../src/Controller/Front'
     tags: ['controller.service_arguments']
+
+  Dimsymfony\Service\ItineraryService: # Assurez-vous que le service est défini
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
+      $httpClient: '@Symfony\Contracts\HttpClient\HttpClientInterface'
 
   doctrine.orm.entity_manager:
     alias: 'Doctrine\ORM\EntityManagerInterface'
 
-  Symfony\Contracts\HttpClient\HttpClientInterface: ~ # Pour l'injection du client HTTP
+  Symfony\Contracts\HttpClient\HttpClientInterface: ~
