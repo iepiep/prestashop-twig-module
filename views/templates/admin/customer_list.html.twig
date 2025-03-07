@@ -6,44 +6,119 @@
       <i class="material-icons">list</i> {{ 'Customer Itineraries'|trans({}, 'Modules.Dimsymfony.Admin') }}
     </h3>
     <div class="card-body">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>{{ 'ID'|trans({}, 'Admin.Global') }}</th>
-            <th>{{ 'Customer Name'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
-            <th>{{ 'Destination'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
-            <th>{{ 'Travel Date'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
-            <th>{{ 'Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
-            <th>{{ 'Actions'|trans({}, 'Admin.Actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for customer in customerData %}
+      <form id="itinerary-form" action="{{ path('dimsymfony_itinerary') }}" method="post">
+        <table class="table">
+          <thead>
             <tr>
-              <td>{{ customer.id }}</td>
-              <td>{{ customer.customerName }}</td>
-              <td>{{ customer.destination }}</td>
-              <td>{{ customer.travelDate|date('Y-m-d') }}</td>
-              <td>
-                {% if customer.itineraryDetails is not null %}
+              <th>{{ 'ID'|trans({}, 'Admin.Global') }}</th>
+              <th>{{ 'Customer Name'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Destination'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Travel Date'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>{{ 'Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}</th>
+              <th>
+                <input type="checkbox" id="select-all"> {{ 'Select All'|trans({}, 'Admin.Actions') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for customer in customerData %}
+              <tr>
+                <td>{{ customer.id }}</td>
+                <td>{{ customer.customerName }}</td>
+                <td>{{ customer.destination }}</td>
+                <td>{{ customer.travelDate|date('Y-m-d') }}</td>
+                <td>
+                    {% if customer.itineraryDetails is not null %}
                         {{ customer.itineraryDetails }}
                     {% else %}
                         {{ 'Not generated'|trans({}, 'Modules.Dimsymfony.Admin') }}
                     {% endif %}
                 </td>
-              <td>
-                <a href="{{ path('dimsymfony_itinerary', {id: customer.id}) }}" class="btn btn-primary">
-                  {{ 'View Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}
-                </a>
-              </td>
-            </tr>
-          {% else %}
-            <tr>
-              <td colspan="4">{{ 'No customer data found.'|trans({}, 'Modules.Dimsymfony.Admin') }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                <td>
+                  <input type="checkbox" name="selected_customers[]" value="{{ customer.id }}" class="customer-checkbox">
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="6">{{ 'No customer data found.'|trans({}, 'Modules.Dimsymfony.Admin') }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">{{ 'Generate Itinerary'|trans({}, 'Modules.Dimsymfony.Admin') }}</button>
+      </form>
     </div>
   </div>
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    $(document).ready(function() {
+        // Gérer la case à cocher "Sélectionner tout"
+        $('#select-all').on('change', function() {
+            $('.customer-checkbox').prop('checked', $(this).is(':checked'));
+        });
+        // Gérer la soumission du formulaire en AJAX
+        $('#itinerary-form').on('submit', function(e) {
+            e.preventDefault(); // Empêcher la soumission standard
+
+            var form = $(this);
+            var url = form.attr('action');
+            var data = form.serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                dataType: 'json',
+                success: function(response) {
+                    // Rediriger vers la page de l'itinéraire avec l'ID (ou les IDs)
+                    // window.location.href = '{{ path('dimsymfony_itinerary_view', {id: 'CUSTOMER_ID'}) }}'.replace('CUSTOMER_ID', response.itinerary_id);
+                    //Ici il faut afficher page avec itineraire, pas besoin de redirect, on a tout dans response
+                    // Créer une nouvelle fenêtre ou un onglet
+                    var itineraryWindow = window.open("", "_blank");
+                    itineraryWindow.document.write('<html><head><title>Itinerary</title></head><body>');
+                    itineraryWindow.document.write('<h1>Optimized Itinerary</h1>');
+
+                    // Afficher l'adresse de départ
+                    itineraryWindow.document.write('<h2>Starting Address:</h2><p>' + response.start_address + '</p>');
+
+                    // Afficher l'itinéraire optimisé
+                    itineraryWindow.document.write('<h2>Optimized Route:</h2><ul>');
+                    response.optimized_route.forEach(function(stop) {
+                      if (stop.is_base) {
+                        itineraryWindow.document.write('<li>Base: ' + stop.full_address + '</li>');
+                      } else {
+                        itineraryWindow.document.write('<li>Client: ' + stop.firstname + ' ' + stop.lastname + ' - ' + stop.full_address + '</li>');
+                      }
+                    });
+                    itineraryWindow.document.write('</ul>');
+
+                    // Afficher le planning de l'itinéraire
+                    itineraryWindow.document.write('<h2>Itinerary Schedule:</h2><ul>');
+                    response.itinerary_schedule.forEach(function(item) {
+                      itineraryWindow.document.write('<li>' + item.time + ' - ' + item.firstname + ' ' + item.lastname + ' (' + item.address + ')</li>');
+                    });
+                    itineraryWindow.document.write('</ul>');
+
+                    itineraryWindow.document.write('</body></html>');
+                    itineraryWindow.document.close();
+
+
+                },
+                error: function(xhr) {
+                   // Extraire le message d'erreur de la réponse
+                    var errorMessage = 'An error occurred.'; // Message par défaut
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    } else if (xhr.responseText) {
+                        errorMessage = xhr.responseText;
+                    }
+                    // Afficher le message d'erreur (par exemple, avec une alerte)
+                    alert(errorMessage);
+                }
+            });
+        });
+    });
+  </script>
 {% endblock %}
