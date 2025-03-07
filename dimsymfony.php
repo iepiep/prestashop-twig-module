@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
-use Dimsymfony\Entity\CustomerItinerary; // Import the entity
+use Dimsymfony\Entity\CustomerItinerary;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -35,21 +35,21 @@ class Dimsymfony extends Module implements WidgetInterface
     public function install()
     {
         return parent::install()
-            && $this->registerHook('displayHome') // Example hook
+            && $this->registerHook('displayHome') // Keep this hook
             && $this->installTab()
-            && $this->installDatabase(); // Install the database table
+            && $this->installDatabase();
     }
 
     public function uninstall()
     {
         return parent::uninstall()
             && $this->uninstallTab()
-            && $this->uninstallDatabase(); // Uninstall the database table
+            && $this->uninstallDatabase();
     }
 
     private function installTab()
     {
-        // ... (same as previous response, no changes here) ...
+        // ... (same as previous response) ...
         $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
         if (!$tabId) {
             $tab = new Tab();
@@ -68,10 +68,11 @@ class Dimsymfony extends Module implements WidgetInterface
 
         return $tab->save() && $this->installSubTabs();
     }
+
     private function installSubTabs()
     {
-        // ... (same as previous response, no changes here) ...
-        $subTabs = [
+         // ... (same as previous response) ...
+         $subTabs = [
             [
                 'class_name' => 'DimsymfonyConfiguration',
                 'name' => 'Configuration',
@@ -123,17 +124,18 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function uninstallTab()
     {
-         // ... (same as previous response, no changes here) ...
-         $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
-         if ($tabId) {
-             $tab = new Tab($tabId);
-             return $tab->delete() && $this->uninstallSubTabs(); //Correct order.
-         }
-         return true; //If no tab id, consider uninstalled.
+        // ... (same as previous response) ...
+        $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
+        if ($tabId) {
+            $tab = new Tab($tabId);
+            return $tab->delete() && $this->uninstallSubTabs(); //Correct order.
+        }
+        return true; //If no tab id, consider uninstalled.
     }
+
     private function uninstallSubTabs()
     {
-        // ... (same as previous response, no changes here) ...
+        // ... (same as previous response) ...
         $subTabs = [
             'DimsymfonyConfiguration',
             'DimsymfonyOtherPage',
@@ -154,7 +156,8 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function installDatabase()
     {
-        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'customer_itinerary` (
+         // ... (same as previous response) ...
+         $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'customer_itinerary` (
             `id_customer_itinerary` INT UNSIGNED NOT NULL AUTO_INCREMENT,
             `customer_name` VARCHAR(255) NOT NULL,
             `destination` VARCHAR(255) NOT NULL,
@@ -168,16 +171,45 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function uninstallDatabase()
     {
+        // ... (same as previous response) ...
         $sql = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'customer_itinerary`;';
         return Db::getInstance()->execute($sql);
     }
+
+
+    // WidgetInterface methods (Implementation)
     public function renderWidget($hookName, array $configuration)
     {
-        // Implement widget rendering if you use hooks (e.g., displayHome)
+        if ($hookName !== 'displayHome') {
+            return; // Only render on the home page
+        }
+
+        $widgetVariables = $this->getWidgetVariables($hookName, $configuration);
+
+        if (empty($widgetVariables)) {
+            return;
+        }
+
+        $this->smarty->assign($widgetVariables);
+        return $this->fetch('module:dimsymfony/views/templates/hook/home.tpl'); // New template
     }
 
     public function getWidgetVariables($hookName, array $configuration)
     {
-        // Implement widget variables if you use hooks
+        if ($hookName !== 'displayHome') {
+            return [];
+        }
+        // Fetch destinations from the database.  Use DQL for efficiency.
+        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $query = $entityManager->createQuery(
+            'SELECT DISTINCT c.destination FROM Dimsymfony\Entity\CustomerItinerary c'
+        );
+        $destinations = $query->getResult();
+
+
+        // Return the variables to be used in the template
+        return [
+            'destinations' => $destinations,
+        ];
     }
 }
