@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
-use Dimsymfony\Entity\CustomerItinerary;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface; // Pour générer l'URL du FrontController
+use Dimsymfony\Entity\Rdv; // Utilisation de la nouvelle entité Rdv
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -12,6 +12,7 @@ if (!defined('_PS_VERSION_')) {
 class Dimsymfony extends Module implements WidgetInterface
 {
     private $urlGenerator;
+
     public function __construct()
     {
         $this->name = 'dimsymfony';
@@ -25,11 +26,9 @@ class Dimsymfony extends Module implements WidgetInterface
         parent::__construct();
 
         $this->displayName = $this->trans('Dim Symfony Module', [], 'Modules.Dimsymfony.Admin');
-        $this->description = $this->trans('A simple module to demonstrate PrestaShop 8 development.', [], 'Modules.Dimsymfony.Admin');
+        $this->description = $this->trans('A module for appointment scheduling and route optimization.', [], 'Modules.Dimsymfony.Admin'); // Description plus précise
         $this->confirmUninstall = $this->trans('Are you sure you want to uninstall?', [], 'Modules.Dimsymfony.Admin');
-        //Récupération du service de génération d'URL. Important pour le lien dans le widget
         $this->urlGenerator = $this->get('router');
-
     }
 
     public function isUsingNewTranslationSystem(): bool
@@ -40,7 +39,7 @@ class Dimsymfony extends Module implements WidgetInterface
     public function install()
     {
         return parent::install()
-            && $this->registerHook('displayBanner') // Utilisation de displayBanner
+            && $this->registerHook('displayBanner')
             && $this->installTab()
             && $this->installDatabase()
             && Configuration::updateValue('DIMSYMFONY_BASE_LOCATION', '25 rue de la Noé Pierre, 53960 Bonchamp-lès-Laval, France');
@@ -48,14 +47,15 @@ class Dimsymfony extends Module implements WidgetInterface
 
     public function uninstall()
     {
-      return parent::uninstall()
-          && $this->uninstallTab()
-          && $this->uninstallDatabase()
-          && Configuration::deleteByName('DIMSYMFONY_BASE_LOCATION'); // Supprimer la configuration
+        return parent::uninstall()
+            && $this->uninstallTab()
+            && $this->uninstallDatabase()
+            && Configuration::deleteByName('DIMSYMFONY_BASE_LOCATION');
     }
+
     private function installTab()
     {
-        // ... (same as previous response) ...
+        // ... (Pas de changements ici) ...
         $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
         if (!$tabId) {
             $tab = new Tab();
@@ -74,10 +74,10 @@ class Dimsymfony extends Module implements WidgetInterface
 
         return $tab->save() && $this->installSubTabs();
     }
-
     private function installSubTabs()
     {
-        $subTabs = [
+         // ... (Pas de changements ici) ...
+         $subTabs = [
             [
                 'class_name' => 'DimsymfonyConfiguration',
                 'name' => 'Configuration',
@@ -124,7 +124,8 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function uninstallTab()
     {
-        $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
+         // ... (Pas de changements ici) ...
+         $tabId = (int) Tab::getIdFromClassName('DimsymfonyTab');
         if ($tabId) {
             $tab = new Tab($tabId);
             return $tab->delete() && $this->uninstallSubTabs();
@@ -134,6 +135,7 @@ class Dimsymfony extends Module implements WidgetInterface
 
     private function uninstallSubTabs()
     {
+        // ... (Pas de changements ici) ...
         $subTabs = [
             'DimsymfonyConfiguration',
             'DimsymfonyCustomerList', // Changement de nom
@@ -152,41 +154,32 @@ class Dimsymfony extends Module implements WidgetInterface
         return $success;
     }
 
-
     private function installDatabase()
     {
-        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'customer_itinerary` (
-            `id_customer_itinerary` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-            `customer_name` VARCHAR(255) NOT NULL,
-            `destination` VARCHAR(255) NOT NULL,
-            `travel_date` DATE NOT NULL,
-            `itinerary_details` TEXT,
-            PRIMARY KEY (`id_customer_itinerary`)
-        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
-
+        $sql = file_get_contents(_PS_MODULE_DIR_ . $this->name . '/sql/install.sql');
+        $sql = str_replace('{prefix}', _DB_PREFIX_, $sql); // Remplacement correct du préfixe
         return Db::getInstance()->execute($sql);
     }
 
     private function uninstallDatabase()
     {
-        $sql = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'customer_itinerary`;';
+        $sql = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'dim_rdv`;'; // Utilisation de dim_rdv
         return Db::getInstance()->execute($sql);
     }
 
-    // Widget pour displayBanner
     public function renderWidget($hookName, array $configuration)
     {
-
-        if ($hookName != 'displayBanner') {
+       // ... (Pas de changements ici) ...
+       if ($hookName != 'displayBanner') {
             return '';
         }
         $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
         return $this->fetch('module:dimsymfony/views/templates/hook/banner.tpl');
-
     }
 
     public function getWidgetVariables($hookName, array $configuration)
     {
+        // ... (Pas de changements ici) ...
         if ($hookName != 'displayBanner') {
             return [];
         }
